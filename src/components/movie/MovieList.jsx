@@ -3,11 +3,10 @@ import MovieCard from './MovieCard'
 import useSWR from 'swr'
 import { fetcher } from '@/config.js'
 import { useEffect, useState } from 'react'
-
-const apiListMovie = (type) => `https://api.themoviedb.org/3/movie/${type}?api_key=f379b750fd188bc3ec72f0760d768302`
+import { tmdbAPI } from '../../config'
 
 const MovieList = ({ type = 'now_playing' }) => {
-  const { data } = useSWR(apiListMovie(type), fetcher)
+  const { data } = useSWR(tmdbAPI.getMovieList(type), fetcher)
   const [movies, setMovie] = useState()
 
   useEffect(() => {

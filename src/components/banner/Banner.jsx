@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import { fetcher } from '@/config.js'
+import { fetcher, tmdbAPI } from '@/config.js'
 import { SwiperSlide, Swiper } from 'swiper/react'
 
 // import required modules
@@ -9,16 +9,11 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules'
 import 'swiper/css/pagination'
 import 'swiper/css/navigation'
 import { useNavigate } from 'react-router-dom'
+import Button from '../button/Button'
 
 const Banner = () => {
-  const { data } = useSWR(
-    `https://api.themoviedb.org/3/movie/upcoming?api_key=f379b750fd188bc3ec72f0760d768302`,
-    fetcher
-  )
-  const dataGenre = useSWR(
-    `https://api.themoviedb.org/3/genre/movie/list?api_key=f379b750fd188bc3ec72f0760d768302`,
-    fetcher
-  )
+  const { data } = useSWR(tmdbAPI.getMovieList('upcoming'), fetcher)
+  const dataGenre = useSWR(tmdbAPI.getMovieGenre(), fetcher)
   const movies = data?.results || []
   const genres = dataGenre?.data?.genres || []
 
@@ -54,7 +49,7 @@ const Banner = () => {
 }
 
 function BannerItem({ item, genres }) {
-  const { title, backdrop_path } = item
+  const { title, backdrop_path, id } = item
   const navigate = useNavigate()
 
   return (
@@ -74,8 +69,7 @@ function BannerItem({ item, genres }) {
             </span>
           ))}
         </div>
-        {/* <Button onClick={() => navigate(`/movie/${id}`)}>Watch now</Button> */}
-        <button onClick={() => navigate(`/movies/${item?.id}`)}>Watch now</button>
+        <Button onClick={() => navigate(`/movie/${id}`)}>Watch now</Button>
       </div>
     </div>
   )

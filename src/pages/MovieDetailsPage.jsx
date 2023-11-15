@@ -111,7 +111,6 @@ function MovieSimilar() {
   const { data } = useSWR(`https://api.themoviedb.org/3/movie/${movieId}/similar?api_key=${apiKey}`, fetcher)
   if (!data) return null
   const { results } = data
-  console.log('MovieSimilar ~ results:', results)
   if (!results || results.length === 0) return null
   return (
     <div className='py-10'>

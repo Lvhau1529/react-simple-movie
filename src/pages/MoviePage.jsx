@@ -1,18 +1,43 @@
 import useSWR from 'swr'
-import { fetcher } from '../config'
+import { apiKey, fetcher } from '../config'
 import MovieCard from '../components/movie/MovieCard'
 import { useEffect, useState } from 'react'
-
-const apiPopularMovie = () => `https://api.themoviedb.org/3/movie/popular?api_key=f379b750fd188bc3ec72f0760d768302`
+import useDebounce from '../hooks/useDebounce'
+import ReactPaginate from 'react-paginate'
 
 const MoviePage = () => {
-  const { data } = useSWR(apiPopularMovie(), fetcher)
-
   const [movies, setMovies] = useState()
+  const [filter, setFilter] = useState()
+  const [pageCount, setPageCount] = useState()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [url, setUrl] = useState()
+  const itemsPerPage = 25
+
+  const { data } = useSWR(url, fetcher)
+  const filterDebounce = useDebounce(filter, 500)
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value)
+  }
+
+  const handlePageClick = (event) => {
+    setCurrentPage(+event.selected + 1)
+  }
 
   useEffect(() => {
-    if (data && data.results) setMovies(data.results)
+    if (data && data.results) {
+      setMovies(data.results)
+      setPageCount(Math.ceil(data.total_results / itemsPerPage))
+    }
   }, [data])
+
+  useEffect(() => {
+    if (filterDebounce) {
+      setUrl(`https://api.themoviedb.org/3/search/movie?query=${filterDebounce}&api_key=${apiKey}`)
+    } else {
+      setUrl(`https://api.themoviedb.org/3/movie/popular?page=${currentPage}&api_key=${apiKey}`)
+    }
+  }, [filterDebounce, currentPage])
 
   return (
     <>
@@ -23,6 +48,7 @@ const MoviePage = () => {
               type='text'
               className='w-full p-4 bg-slate-800 text-white outline-none rounded-tl-lg rounded-bl-lg'
               placeholder='Type here to search...'
+              onChange={handleFilterChange}
             />
           </div>
           <button className='p-4 bg-primary text-white rounded-tr-lg rounded-br-lg'>
@@ -42,9 +68,19 @@ const MoviePage = () => {
             </svg>
           </button>
         </div>
-        <div className='grid grid-cols-4 gap-10'>
+        <div className='grid grid-cols-4 gap-10 mb-10'>
           {movies?.length > 0 && movies?.map((item) => <MovieCard key={item.id} props={item}></MovieCard>)}
         </div>
+        <ReactPaginate
+          breakLabel='...'
+          nextLabel='next >'
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          previousLabel='< previous'
+          renderOnZeroPageCount={null}
+          className="pagination"
+        />
       </div>
     </>
   )
