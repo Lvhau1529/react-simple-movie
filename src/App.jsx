@@ -1,30 +1,34 @@
-import './App.css'
+import { Suspense, lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import HomePage from './pages/HomePage'
 import Main from './components/layouts/Main'
-import Banner from './components/banner/Banner'
-import MoviePage from './pages/MoviePage'
-import MovieDetailsPage from './pages/MovieDetailsPage'
+import './App.css'
 import 'swiper/css'
+
+const HomePage = lazy(() => import('@/pages/HomePage'))
+const Banner = lazy(() => import('@/components/banner/Banner'))
+const MoviePageV2 = lazy(() => import('@/pages/MoviePageV2'))
+const MovieDetailsPage = lazy(() => import('@/pages/MovieDetailsPage'))
 
 function App() {
   return (
     <>
-      <Routes>
-        <Route element={<Main />}>
-          <Route
-            path='/'
-            element={
-              <>
-                <Banner />
-                <HomePage />
-              </>
-            }
-          />
-          <Route path='/movies' element={<MoviePage />} />
-          <Route path='/movie/:movieId' element={<MovieDetailsPage />} />
-        </Route>
-      </Routes>
+      <Suspense>
+        <Routes>
+          <Route element={<Main />}>
+            <Route
+              path='/'
+              element={
+                <>
+                  <Banner />
+                  <HomePage />
+                </>
+              }
+            />
+            <Route path='/movies' element={<MoviePageV2 />} />
+            <Route path='/movie/:movieId' element={<MovieDetailsPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </>
   )
 }
