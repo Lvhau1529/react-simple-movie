@@ -18,7 +18,7 @@ const MovieList = ({ type = 'now_playing' }) => {
         <Swiper slidesPerView={'auto'} spaceBetween={40} grabCursor={true}>
           {movies?.map((item) => (
             <SwiperSlide key={item.id}>
-              <MovieCard props={item} />
+              <MovieCard item={item} />
             </SwiperSlide>
           ))}
         </Swiper>
